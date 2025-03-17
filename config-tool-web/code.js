@@ -771,11 +771,53 @@ function set_port_badge(button_element, port) {
     }
 }
 
+function move_up_onclick(mapping, element) {
+    return function() {
+        const mappingsContainer = document.getElementById("mappings");
+        const index = config['mappings'].indexOf(mapping);
+        
+        if (index > 0) {
+            // Swap in the config array
+            const temp = config['mappings'][index];
+            config['mappings'][index] = config['mappings'][index - 1];
+            config['mappings'][index - 1] = temp;
+            
+            // Swap in the DOM
+            const prevElement = element.previousElementSibling;
+            if (prevElement) {
+                mappingsContainer.insertBefore(element, prevElement);
+            }
+        }
+    };
+}
+
+function move_down_onclick(mapping, element) {
+    return function() {
+        const mappingsContainer = document.getElementById("mappings");
+        const index = config['mappings'].indexOf(mapping);
+        
+        if (index < config['mappings'].length - 1) {
+            // Swap in the config array
+            const temp = config['mappings'][index];
+            config['mappings'][index] = config['mappings'][index + 1];
+            config['mappings'][index + 1] = temp;
+            
+            // Swap in the DOM
+            const nextElement = element.nextElementSibling;
+            if (nextElement) {
+                mappingsContainer.insertBefore(nextElement, element);
+            }
+        }
+    };
+}
+
 function add_mapping(mapping) {
     const template = document.getElementById("mapping_template");
     const container = document.getElementById("mappings");
     const clone = template.content.cloneNode(true).firstElementChild;
     clone.querySelector(".delete_button").addEventListener("click", delete_mapping(mapping, clone));
+    clone.querySelector(".move_up_button").addEventListener("click", move_up_onclick(mapping, clone));
+    clone.querySelector(".move_down_button").addEventListener("click", move_down_onclick(mapping, clone));
     const sticky_checkbox = clone.querySelector(".sticky_checkbox");
     sticky_checkbox.checked = mapping['sticky'];
     sticky_checkbox.addEventListener("change", sticky_onclick(mapping, sticky_checkbox));
